@@ -1,4 +1,4 @@
-package com.test.mtclone
+package com.test.mtclone.core.axml
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

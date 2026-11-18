@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MT Clone</string>
+
+    <!-- Umum -->
+    <string name="ok">OKE</string>
+    <string name="cancel">MEMBATALKAN</string>
+    <string name="close">TUTUP</string>
+    <string name="save">Simpan</string>
+    <string name="saved">Tersimpan.</string>
+    <string name="save_failed">Gagal menyimpan: %1$s</string>
+    <string name="not_implemented">Belum diimplementasikan.</string>
+
+    <!-- Deskripsi ikon (aksesibilitas) -->
+    <string name="cd_menu">Menu pintasan</string>
+    <string name="cd_more">Opsi lainnya</string>
+    <string name="cd_back">Kembali</string>
+    <string name="cd_forward">Maju</string>
+    <string name="cd_create">Buat baru</string>
+    <string name="cd_swap">Tukar jendela</string>
+    <string name="cd_up">Naik satu folder</string>
+
+    <!-- Layar utama -->
+    <string name="window_left">Jendela Kiri</string>
+    <string name="window_right">Jendela Kanan</string>
+    <string name="stat_format">Folder: %1$d File: %2$d Penyimpanan: %3$s/%4$s</string>
+    <string name="waiting_permission">Menunggu izin akses file…</string>
+    <string name="permission_hint">Izinkan \"Akses semua file\" lalu kembali ke app.</string>
+    <string name="terminal_unavailable">Terminal belum tersedia di MT Clone.</string>
+    <string name="bookmark_added">Bookmark ditambahkan.</string>
+    <string name="homepage_set">Homepage diset ke folder ini.</string>
+
+    <!-- Menu ⋮ -->
+    <string name="menu_refresh">Menyegarkan</string>
+    <string name="menu_search">Mencari</string>
+    <string name="menu_filter">Saring</string>
+    <string name="menu_sort">Menyortir</string>
+    <string name="menu_terminal">Buka terminal</string>
+    <string name="menu_hidden">File tersembunyi</string>
+    <string name="menu_show_hidden">Tampilkan file tersembunyi</string>
+    <string name="menu_bookmark">Tambahkan bookmark</string>
+    <string name="menu_homepage">Setel sebagai homepage</string>
+    <string name="menu_swap">Tukar jendela</string>
+    <string name="menu_prefs">Preferensi</string>
+    <string name="menu_exit">keluar</string>
+
+    <!-- Pintasan (tombol ☰) -->
+    <string name="shortcuts_title">Pintasan</string>
+    <string name="shortcut_internal">Penyimpanan internal</string>
+    <string name="shortcut_home">Beranda: %1$s</string>
+
+    <!-- Buat baru -->
+    <string name="create_title">Membuat</string>
+    <string name="create_hint">Nama</string>
+    <string name="create_file">FILE</string>
+    <string name="create_folder">FOLDER</string>
+    <string name="create_file_failed">Gagal membuat file.</string>
+    <string name="create_folder_failed">Gagal membuat folder.</string>
+
+    <!-- Sortir -->
+    <string name="sort_title">Menyortir - %1$s</string>
+    <string name="sort_name">dengan nama</string>
+    <string name="sort_size">berdasarkan Ukuran</string>
+    <string name="sort_date">tanggal</string>
+    <string name="sort_type">menurut Jenis</string>
+    <string name="sort_only_folder">Hanya berlaku untuk folder ini</string>
+    <string name="sort_reverse">Urutan terbalik</string>
+
+    <!-- Saring & cari -->
+    <string name="filter_hint">Bagian nama file</string>
+    <string name="filter_clear">HAPUS</string>
+    <string name="search_hint">Cari nama (termasuk subfolder)</string>
+    <string name="search_action">CARI</string>
+    <string name="searching">Mencari…</string>
+    <string name="search_empty">Tidak ada hasil.</string>
+    <string name="search_results">Hasil pencarian (%1$d)</string>
+
+    <!-- Buka dengan (APK) -->
+    <string name="open_with_title">Buka dengan…</string>
+    <string name="open_install">Install</string>
+    <string name="open_view">Melihat</string>
+    <string name="open_sign">Tanda tangani file</string>
+    <string name="open_convert">Konversikan ke apk</string>
+
+    <!-- Tanda tangan (testkey AOSP) -->
+    <string name="signing_progress">Menandatangani dengan testkey AOSP…</string>
+    <string name="sign_done">Selesai: %1$s</string>
+    <string name="sign_failed">Gagal menandatangani: %1$s</string>
+    <string name="sign_apks_unsupported">Format .apks (split) belum didukung. Ekstrak dulu lalu tanda tangani tiap .apk.</string>
+
+    <!-- Penjelajah APK -->
+    <string name="apk_open_button">Buka APK</string>
+    <string name="apk_empty">Belum ada APK dibuka.\nKetuk \"Buka APK\" di pojok kanan atas.</string>
+    <string name="apk_path_root">/%1$s</string>
+    <string name="apk_n_items">%1$d item</string>
+    <string name="dex_title">%1$s (%2$d class)</string>
+    <string name="smali_failed">// gagal membongkar %1$s menjadi smali</string>
+    <string name="hex_truncated">… dipotong, total %1$d byte</string>
+    <string name="save_as_apk">Simpan sbg APK</string>
+    <string name="save_signed_done">Disimpan dan ditandatangani (testkey AOSP).</string>
+
+    <!-- Preferensi -->
+    <string name="prefs_title">Preferensi</string>
+    <string name="prefs_section_start">Awal</string>
+    <string name="prefs_section_look">Penampilan</string>
+    <string name="prefs_section_general">Umum</string>
+    <string name="pref_startup_left">Jalur startup - jendela kiri</string>
+    <string name="pref_startup_right">Jalur startup - jendela kanan</string>
+    <string name="startup_home">Beranda</string>
+    <string name="startup_last">Terakhir dibuka</string>
+    <string name="pref_list_size">Ukuran daftar file</string>
+    <string name="size_small">Kecil</string>
+    <string name="size_medium">Sedang</string>
+    <string name="size_large">Besar</string>
+    <string name="pref_name_lines">Baris maksimum nama file</string>
+    <string name="pref_date_format">Format waktu tanggal</string>
+    <string name="pref_show_hidden">Tampilkan file tersembunyi</string>
+    <string name="pref_show_hidden_sum">File dan folder yang namanya diawali titik.</string>
+    <string name="pref_backup">Hasilkan file cadangan</string>
+    <string name="pref_backup_sum">Secara otomatis mengganti nama file asli menjadi file cadangan .bak saat menyimpan file.</string>
+</resources>

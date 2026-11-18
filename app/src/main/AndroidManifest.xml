@@ -14,12 +14,14 @@
 
     <application
         android:allowBackup="false"
-        android:label="MT Clone"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.MTClone">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,11 +31,14 @@
 
         <!-- Browser isi 1 file APK (zip + dex/manifest), dibuka dari file picker ATAU
              dari MainActivity lewat "Buka dengan... > Melihat". -->
-        <activity android:name=".ApkOpenActivity" android:exported="false" />
-        <activity android:name=".ApkEntryViewerActivity" android:exported="false" />
+        <activity android:name=".ui.apk.ApkOpenActivity" android:exported="false" />
+        <activity android:name=".ui.apk.ApkEntryViewerActivity" android:exported="false" />
 
         <!-- Viewer/editor file lepas di disk (bukan isi APK). -->
-        <activity android:name=".LocalFileViewer" android:exported="false" />
+        <activity android:name=".ui.viewer.LocalFileViewer" android:exported="false" />
+
+        <!-- Layar Preferensi. -->
+        <activity android:name=".ui.settings.PreferencesActivity" android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

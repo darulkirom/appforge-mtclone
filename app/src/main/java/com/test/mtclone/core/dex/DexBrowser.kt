@@ -1,5 +1,6 @@
-package com.test.mtclone
+package com.test.mtclone.core.dex
 
+import com.test.mtclone.core.apk.ZipTree
 import org.jf.baksmali.Baksmali
 import org.jf.baksmali.BaksmaliOptions
 import org.jf.dexlib2.DexFileFactory
@@ -27,15 +28,15 @@ object DexBrowser {
     fun classNames(dex: DexFile): List<String> =
         dex.classes.map { it.type }.sorted()
 
-    /** classType contoh: "Lcom/test/mtclone/MainActivity;" (format descriptor dex, sama seperti classNames()). */
-    fun smaliOf(dex: DexFile, classType: String): String {
+    /** Mengembalikan null kalau disassemble gagal / hasil tidak ditemukan. classType contoh: "Lcom/test/mtclone/MainActivity;" (format descriptor dex, sama seperti classNames()). */
+    fun smaliOf(dex: DexFile, classType: String): String? {
         val outDir = File.createTempFile("baksmali", "").apply { delete(); mkdirs() }
         val options = BaksmaliOptions()
         val ok = Baksmali.disassembleDexFile(dex, outDir, 1, options, listOf(classType))
-        if (!ok) return "// gagal disassemble $classType"
+        if (!ok) return null
 
         val smaliFile = outDir.walkTopDown().firstOrNull { it.isFile && it.extension == "smali" }
-            ?: return "// tidak ketemu hasil .smali untuk $classType"
+            ?: return null
         val text = smaliFile.readText()
         outDir.deleteRecursively()
         return text

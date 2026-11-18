@@ -1,48 +1,54 @@
-package com.test.mtclone
+package com.test.mtclone.ui.apk
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.test.mtclone.R
+import com.test.mtclone.core.apk.ZipNode
+import com.test.mtclone.core.apk.ZipTree
+import com.test.mtclone.core.file.FileOps
+import com.test.mtclone.ui.common.AppBar
+import com.test.mtclone.ui.common.IconKind
+import com.test.mtclone.ui.common.bindKind
+import com.test.mtclone.ui.common.color
+import com.test.mtclone.ui.common.dp
+import com.test.mtclone.ui.common.newIconBadge
+import com.test.mtclone.ui.common.rippleDrawable
 import java.io.File
 
+/** Menelusuri isi satu APK (zip) sebagai folder. */
 class ApkOpenActivity : AppCompatActivity() {
 
+    private lateinit var bar: AppBar
     private lateinit var list: RecyclerView
     private lateinit var empty: TextView
-    private lateinit var pathLabel: TextView
 
     private var apkFile: File? = null
     private var root: ZipNode? = null
     private var current: ZipNode? = null
     private val stack = ArrayDeque<ZipNode>()
 
-    private val pickApk = registerForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
-    ) { uri: Uri? ->
+    private val pickApk = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) openApk(uri)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(buildUi())
-        // Dipanggil dari MainActivity (dual-pane explorer) dengan path langsung -> skip file picker.
-        val directPath = intent.getStringExtra("apkPath")
-        if (directPath != null) {
-            openApkFile(File(directPath))
-        } else {
-            openPicker()
-        }
+        // Dipanggil dari MainActivity dengan path langsung -> lewati file picker.
+        val directPath = intent.getStringExtra(EXTRA_APK_PATH)
+        if (directPath != null) openApkFile(File(directPath)) else openPicker()
     }
 
     private fun openPicker() {
@@ -67,7 +73,7 @@ class ApkOpenActivity : AppCompatActivity() {
 
     private fun render() {
         val node = current ?: return
-        pathLabel.text = "/" + stack.joinToString("/") { it.name }
+        bar.title.text = getString(R.string.apk_path_root, stack.joinToString("/") { it.name })
         val items = node.children.values.sortedWith(compareByDescending<ZipNode> { it.isDir }.thenBy { it.name })
         empty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         list.adapter = EntryAdapter(items) { entry -> onEntryClick(entry) }
@@ -80,13 +86,15 @@ class ApkOpenActivity : AppCompatActivity() {
             render()
         } else {
             val apk = apkFile ?: return
-            val intent = Intent(this, ApkEntryViewerActivity::class.java)
-            intent.putExtra("apkPath", apk.absolutePath)
-            intent.putExtra("zipName", entry.zipName)
-            startActivity(intent)
+            startActivity(
+                Intent(this, ApkEntryViewerActivity::class.java)
+                    .putExtra(ApkEntryViewerActivity.EXTRA_APK_PATH, apk.absolutePath)
+                    .putExtra(ApkEntryViewerActivity.EXTRA_ZIP_NAME, entry.zipName)
+            )
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (stack.isNotEmpty()) {
             stack.removeLast()
@@ -97,58 +105,30 @@ class ApkOpenActivity : AppCompatActivity() {
         }
     }
 
-    // ------------------------------------------------------------------ UI
-
-    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
+    // --------------------------------------------------------------------- UI
 
     private fun buildUi(): View {
-        val root = LinearLayout(this).apply {
+        val rootView = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.parseColor("#0B1220"))
+            setBackgroundColor(color(R.color.pane_inactive))
         }
+        bar = AppBar(this, R.drawable.ic_arrow_back, R.string.cd_back) { finish() }
+        bar.addTextAction(R.string.apk_open_button) { openPicker() }
 
-        val toolbar = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            setPadding(dp(16), dp(28), dp(16), dp(12))
-            setBackgroundColor(Color.parseColor("#111A2E"))
-        }
-        val title = TextView(this).apply {
-            text = "MT Clone"
-            textSize = 18f
-            setTypeface(null, Typeface.BOLD)
-            setTextColor(Color.WHITE)
-        }
-        val openBtn = TextView(this).apply {
-            text = "Buka APK"
-            textSize = 14f
-            setTextColor(Color.parseColor("#60A5FA"))
-            setOnClickListener { openPicker() }
-        }
-        toolbar.addView(title, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        toolbar.addView(openBtn)
-
-        pathLabel = TextView(this).apply {
-            textSize = 12f
-            setTextColor(Color.parseColor("#64748B"))
-            setPadding(dp(16), dp(6), dp(16), dp(6))
-            setBackgroundColor(Color.parseColor("#0F172A"))
-        }
-
-        val container = FrameLayout(this)
         list = RecyclerView(this).apply { layoutManager = LinearLayoutManager(context) }
         empty = TextView(this).apply {
-            text = "Belum ada APK dibuka.\nKetuk \"Buka APK\" di pojok kanan atas."
+            setText(R.string.apk_empty)
             gravity = Gravity.CENTER
-            setTextColor(Color.parseColor("#475569"))
+            setTextColor(color(R.color.text_secondary))
             visibility = View.VISIBLE
         }
+        val container = FrameLayout(this)
         container.addView(list, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         container.addView(empty, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
 
-        root.addView(toolbar)
-        root.addView(pathLabel)
-        root.addView(container, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
-        return root
+        rootView.addView(bar.view)
+        rootView.addView(container, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+        return rootView
     }
 
     private inner class EntryAdapter(
@@ -156,41 +136,46 @@ class ApkOpenActivity : AppCompatActivity() {
         val onClick: (ZipNode) -> Unit
     ) : RecyclerView.Adapter<EntryAdapter.VH>() {
 
-        inner class VH(val row: LinearLayout, val icon: TextView, val name: TextView, val meta: TextView) :
+        inner class VH(val row: LinearLayout, val badge: ImageView, val name: TextView, val meta: TextView) :
             RecyclerView.ViewHolder(row)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
             val row = LinearLayout(parent.context).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(dp(16), dp(14), dp(16), dp(14))
+                setPadding(dp(12), dp(8), dp(12), dp(8))
                 gravity = Gravity.CENTER_VERTICAL
+                background = rippleDrawable()
             }
-            val icon = TextView(parent.context).apply { textSize = 18f; setTextColor(Color.WHITE) }
+            val badge = newIconBadge(36)
             val col = LinearLayout(parent.context).apply { orientation = LinearLayout.VERTICAL }
-            val name = TextView(parent.context).apply { textSize = 15f; setTextColor(Color.WHITE) }
-            val meta = TextView(parent.context).apply { textSize = 11f; setTextColor(Color.parseColor("#64748B")) }
+            val name = TextView(parent.context).apply {
+                textSize = 14f
+                setTextColor(color(R.color.text_primary))
+            }
+            val meta = TextView(parent.context).apply {
+                textSize = 10.5f
+                setTextColor(color(R.color.text_secondary))
+            }
             col.addView(name)
             col.addView(meta)
-            row.addView(icon, LinearLayout.LayoutParams(dp(32), ViewGroup.LayoutParams.WRAP_CONTENT))
+            row.addView(badge, LinearLayout.LayoutParams(dp(36), dp(36)).apply { rightMargin = dp(12) })
             row.addView(col)
-            return VH(row, icon, name, meta)
+            return VH(row, badge, name, meta)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val e = items[position]
-            holder.icon.text = if (e.isDir) "📁" else iconFor(e.name)
+            holder.badge.bindKind(if (e.isDir) IconKind.FOLDER else IconKind.FILE)
             holder.name.text = e.name
-            holder.meta.text = if (e.isDir) "${e.children.size} item" else "${e.size} byte"
+            holder.meta.text =
+                if (e.isDir) getString(R.string.apk_n_items, e.children.size) else FileOps.formatSize(e.size)
             holder.row.setOnClickListener { onClick(e) }
         }
 
         override fun getItemCount() = items.size
+    }
 
-        private fun iconFor(name: String): String = when {
-            FileKind.isDex(name) -> "🧩"
-            FileKind.isManifest(name) -> "📋"
-            FileKind.isLikelyText(name) -> "📄"
-            else -> "🗎"
-        }
+    companion object {
+        const val EXTRA_APK_PATH = "apkPath"
     }
 }

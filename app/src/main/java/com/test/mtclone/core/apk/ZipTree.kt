@@ -1,4 +1,4 @@
-package com.test.mtclone
+package com.test.mtclone.core.apk
 
 import java.io.File
 import java.util.zip.ZipEntry

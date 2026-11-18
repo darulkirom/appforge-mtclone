@@ -1,6 +1,9 @@
-package com.test.mtclone
+package com.test.mtclone.core.file
 
 object FileKind {
+    /** Batas byte yang ditampilkan di hex dump. Pemanggil yang menambahkan catatan "dipotong". */
+    const val HEX_MAX = 4096
+
     private val TEXT_EXT = setOf(
         "xml", "txt", "json", "properties", "pro", "smali", "gradle", "kts",
         "java", "kt", "cfg", "ini", "md", "html", "js", "css", "yml", "yaml"
@@ -10,7 +13,7 @@ object FileKind {
     fun isManifest(name: String) = name == "AndroidManifest.xml"
     fun isLikelyText(name: String) = TEXT_EXT.contains(name.substringAfterLast('.', "").lowercase())
 
-    fun hexDump(bytes: ByteArray, maxBytes: Int = 4096): String {
+    fun hexDump(bytes: ByteArray, maxBytes: Int = HEX_MAX): String {
         val n = minOf(bytes.size, maxBytes)
         val sb = StringBuilder()
         var i = 0
@@ -27,7 +30,6 @@ object FileKind {
             sb.append("\n")
             i += 16
         }
-        if (bytes.size > maxBytes) sb.append("\n… dipotong, total ${bytes.size} byte")
         return sb.toString()
     }
 }

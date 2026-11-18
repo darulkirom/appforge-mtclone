@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_refresh" android:title="@string/menu_refresh" />
+    <item android:id="@+id/action_search" android:title="@string/menu_search" />
+    <item android:id="@+id/action_filter" android:title="@string/menu_filter" />
+    <item android:id="@+id/action_sort" android:title="@string/menu_sort" />
+    <item android:id="@+id/action_terminal" android:title="@string/menu_terminal" />
+    <item android:id="@+id/action_hidden" android:title="@string/menu_hidden">
+        <menu>
+            <item
+                android:id="@+id/action_toggle_hidden"
+                android:checkable="true"
+                android:title="@string/menu_show_hidden" />
+        </menu>
+    </item>
+    <item android:id="@+id/action_bookmark" android:title="@string/menu_bookmark" />
+    <item android:id="@+id/action_homepage" android:title="@string/menu_homepage" />
+    <item android:id="@+id/action_swap" android:title="@string/menu_swap" />
+    <item android:id="@+id/action_prefs" android:title="@string/menu_prefs" />
+    <item android:id="@+id/action_exit" android:title="@string/menu_exit" />
+</menu>

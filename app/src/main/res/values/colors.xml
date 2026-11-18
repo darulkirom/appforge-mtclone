@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mt_bg">#0B1220</color>
-    <color name="mt_bar">#111A2E</color>
+    <!-- Diambil dari rekaman layar referensi (MT Manager gelap) -->
+    <color name="mt_toolbar">#141414</color>
+    <color name="pane_inactive">#2F2F2F</color>
+    <color name="pane_active">#343434</color>
+    <color name="divider">#212121</color>
+    <color name="text_primary">#E6E6E6</color>
+    <color name="text_secondary">#9A9A9A</color>
+    <color name="mt_accent">#3D8BF2</color>
+
+    <!-- Kotak ikon -->
+    <color name="icon_folder_bg">#141414</color>
+    <color name="icon_file_bg">#436072</color>
+    <color name="icon_apk_bg">#6B4F3E</color>
+
+    <!-- Logo launcher -->
+    <color name="ic_launcher_background">#141414</color>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Wajib turunan Theme.AppCompat karena semua activity memakai AppCompatActivity.
-         Versi gelap + NoActionBar: UI dibangun lewat kode dengan warna gelap (#0B1220). -->
+    <!-- Wajib turunan Theme.AppCompat karena semua activity memakai AppCompatActivity. -->
     <style name="Theme.MTClone" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@color/mt_bg</item>
-        <item name="android:statusBarColor">@color/mt_bar</item>
-        <item name="android:navigationBarColor">@color/mt_bg</item>
-        <item name="colorPrimary">@color/mt_bar</item>
-        <item name="colorPrimaryDark">@color/mt_bar</item>
-        <item name="colorAccent">#93C5FD</item>
+        <item name="android:windowBackground">@color/pane_inactive</item>
+        <item name="android:statusBarColor">@color/mt_toolbar</item>
+        <item name="android:navigationBarColor">@color/pane_inactive</item>
+        <item name="colorPrimary">@color/mt_toolbar</item>
+        <item name="colorPrimaryDark">@color/mt_toolbar</item>
+        <item name="colorAccent">@color/mt_accent</item>
+        <item name="android:colorAccent">@color/mt_accent</item>
     </style>
 </resources>

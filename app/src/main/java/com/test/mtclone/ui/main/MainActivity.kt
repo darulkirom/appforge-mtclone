@@ -11,6 +11,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private val prefs by lazy { AppPrefs(this) }
     private val dialogs by lazy { MainDialogs(this, prefs, host) }
+    private val drawer by lazy { StorageDrawer(this, prefs) { dir -> navigateActive(dir) } }
 
     private lateinit var bar: AppBar
     private lateinit var panes: Array<PaneView>
@@ -94,6 +96,10 @@ class MainActivity : AppCompatActivity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        if (drawer.isOpen) {
+            drawer.close()
+            return
+        }
         val pane = panes[active]
         val storageRoot = Environment.getExternalStorageDirectory().absolutePath
         if (pane.state.dir.absolutePath != storageRoot && pane.state.goUp()) {
@@ -155,7 +161,7 @@ class MainActivity : AppCompatActivity() {
     private fun openEntry(f: File) {
         when {
             f.isDirectory -> navigateActive(f)
-            FileOps.isApk(f) -> dialogs.showOpenWith(f)
+            FileOps.isApk(f) -> dialogs.showApk(f)
             else -> startActivity(
                 Intent(this, LocalFileViewer::class.java).putExtra(LocalFileViewer.EXTRA_PATH, f.absolutePath)
             )
@@ -214,7 +220,6 @@ class MainActivity : AppCompatActivity() {
             R.id.action_search -> dialogs.showSearch()
             R.id.action_filter -> dialogs.showFilter()
             R.id.action_sort -> dialogs.showSort()
-            R.id.action_terminal -> Toast.makeText(this, R.string.terminal_unavailable, Toast.LENGTH_SHORT).show()
             R.id.action_toggle_hidden -> {
                 prefs.showHidden = !prefs.showHidden
                 refreshAll()
@@ -243,7 +248,9 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(color(R.color.mt_toolbar))
         }
 
-        bar = AppBar(this, R.drawable.ic_menu, R.string.cd_menu) { dialogs.showShortcuts() }
+        bar = AppBar(this, R.drawable.ic_menu, R.string.cd_menu) { drawer.open() }
+        bar.title.setOnClickListener { dialogs.showGoTo() }
+        bar.subtitle.setOnClickListener { dialogs.showGoTo() }
         bar.addAction(R.drawable.ic_more_vert, R.string.cd_more) { showOverflow(it) }
 
         val body = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
@@ -278,7 +285,11 @@ class MainActivity : AppCompatActivity() {
         root.addView(bar.view)
         root.addView(body, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         root.addView(bottomBar)
-        return root
+
+        val frame = FrameLayout(this)
+        frame.addView(root, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        drawer.attach(frame)
+        return frame
     }
 
     private fun navButton(icon: Int, desc: Int, onClick: () -> Unit): ImageView =

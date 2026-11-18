@@ -26,7 +26,6 @@
     <string name="stat_format">Folder: %1$d File: %2$d Penyimpanan: %3$s/%4$s</string>
     <string name="waiting_permission">Menunggu izin akses file…</string>
     <string name="permission_hint">Izinkan \"Akses semua file\" lalu kembali ke app.</string>
-    <string name="terminal_unavailable">Terminal belum tersedia di MT Clone.</string>
     <string name="bookmark_added">Bookmark ditambahkan.</string>
     <string name="homepage_set">Homepage diset ke folder ini.</string>
 
@@ -35,7 +34,6 @@
     <string name="menu_search">Mencari</string>
     <string name="menu_filter">Saring</string>
     <string name="menu_sort">Menyortir</string>
-    <string name="menu_terminal">Buka terminal</string>
     <string name="menu_hidden">File tersembunyi</string>
     <string name="menu_show_hidden">Tampilkan file tersembunyi</string>
     <string name="menu_bookmark">Tambahkan bookmark</string>
@@ -44,10 +42,55 @@
     <string name="menu_prefs">Preferensi</string>
     <string name="menu_exit">keluar</string>
 
-    <!-- Pintasan (tombol ☰) -->
-    <string name="shortcuts_title">Pintasan</string>
-    <string name="shortcut_internal">Penyimpanan internal</string>
-    <string name="shortcut_home">Beranda: %1$s</string>
+
+    <!-- Drawer (tombol ☰) -->
+    <string name="drawer_local">Lokal</string>
+    <string name="drawer_bookmarks">Bookmark</string>
+    <string name="drawer_root">Direktori Akar</string>
+    <string name="drawer_storage">Direktori Penyimpanan</string>
+    <string name="drawer_sdcard">Kartu SD</string>
+    <string name="drawer_home">Beranda</string>
+    <string name="drawer_usage">%1$s digunakan, %2$s tersedia</string>
+
+    <!-- Langsung ke jalur -->
+    <string name="goto_title">Langsung ke jalan</string>
+    <string name="paste">TEMPEL</string>
+    <string name="path_not_found">Jalur tidak ditemukan.</string>
+
+    <!-- Info APK -->
+    <string name="reading_apk">Membaca APK…</string>
+    <string name="info_package">Nama paket</string>
+    <string name="info_version">Versi</string>
+    <string name="info_file_size">Ukuran file</string>
+    <string name="info_signature">Tanda tangan</string>
+    <string name="info_target_sdk">SDK Target</string>
+    <string name="info_min_sdk">SDK Minimum</string>
+    <string name="info_installed">Dipasang</string>
+    <string name="info_updated">Diperbarui</string>
+    <string name="info_functions">FUNGSI</string>
+    <string name="info_view">MELIHAT</string>
+    <string name="info_install">INSTALL</string>
+    <string name="sdk_format">Android %1$s (API %2$d)</string>
+    <string name="sdk_unknown">API %1$d</string>
+
+    <!-- Info tanda tangan -->
+    <string name="sig_title">Informasi tanda tangan</string>
+    <string name="sig_file">File</string>
+    <string name="sig_scheme">Skema</string>
+    <string name="sig_status">Status</string>
+    <string name="sig_verified">Berhasil diverifikasi</string>
+    <string name="sig_failed_verify">Gagal diverifikasi</string>
+    <string name="sig_unsigned">Tidak bertanda tangan</string>
+    <string name="sig_algorithm">Algoritma</string>
+    <string name="sig_pubkey">Kunci publik</string>
+    <string name="sig_valid_from">Berlaku sejak</string>
+    <string name="sig_valid_to">Berlaku hingga</string>
+    <string name="sig_owner">Pemilik</string>
+    <string name="sig_format">Format</string>
+    <string name="sig_colon">Tambahkan titik dua</string>
+    <string name="sig_upper">Huruf besar</string>
+    <string name="sig_copied">Disalin.</string>
+    <string name="sig_no_cert">Tidak ada sertifikat penanda tangan di APK ini.</string>
 
     <!-- Buat baru -->
     <string name="create_title">Membuat</string>

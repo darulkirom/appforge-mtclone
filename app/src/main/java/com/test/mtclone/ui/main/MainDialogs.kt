@@ -1,7 +1,9 @@
 package com.test.mtclone.ui.main
 
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
-import android.os.Environment
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -14,11 +16,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.test.mtclone.R
+import com.test.mtclone.core.apk.ApkInspector
 import com.test.mtclone.core.file.FileOps
 import com.test.mtclone.core.file.SortBy
 import com.test.mtclone.core.file.SortSpec
 import com.test.mtclone.core.prefs.AppPrefs
 import com.test.mtclone.core.sign.ApkSigning
+import com.test.mtclone.ui.apk.ApkInfoDialogs
 import com.test.mtclone.ui.apk.ApkOpenActivity
 import com.test.mtclone.ui.common.color
 import com.test.mtclone.ui.common.dp
@@ -54,6 +58,37 @@ class MainDialogs(
 
     // ------------------------------------------------------------ buka dengan
 
+    /** Ketuk APK: dialog info (paket, versi, SDK, tanda tangan) dengan tombol FUNGSI / MELIHAT / INSTALL. */
+    fun showApk(f: File) {
+        if (f.extension.equals("apks", true)) {
+            showOpenWith(f)
+            return
+        }
+        toast(R.string.reading_apk)
+        val appContext = activity.applicationContext
+        Thread {
+            val report = try { ApkInspector.inspect(appContext, f) } catch (e: Exception) { null }
+            activity.runOnUiThread {
+                if (report == null) {
+                    showOpenWith(f)
+                } else {
+                    ApkInfoDialogs.showInfo(
+                        activity, report,
+                        onFunctions = { showOpenWith(f) },
+                        onView = { viewApk(f) },
+                        onInstall = { installApk(f) }
+                    )
+                }
+            }
+        }.start()
+    }
+
+    private fun viewApk(f: File) {
+        activity.startActivity(
+            Intent(activity, ApkOpenActivity::class.java).putExtra(ApkOpenActivity.EXTRA_APK_PATH, f.absolutePath)
+        )
+    }
+
     private enum class OpenAction { INSTALL, VIEW, SIGN, CONVERT }
 
     fun showOpenWith(f: File) {
@@ -69,10 +104,7 @@ class MainDialogs(
             .setItems(labels.toTypedArray()) { _, which ->
                 when (entries[which].second) {
                     OpenAction.INSTALL -> installApk(f)
-                    OpenAction.VIEW -> activity.startActivity(
-                        Intent(activity, ApkOpenActivity::class.java)
-                            .putExtra(ApkOpenActivity.EXTRA_APK_PATH, f.absolutePath)
-                    )
+                    OpenAction.VIEW -> viewApk(f)
                     OpenAction.SIGN -> signApk(f)
                     OpenAction.CONVERT -> toast(R.string.not_implemented)
                 }
@@ -261,27 +293,39 @@ class MainDialogs(
             .show()
     }
 
-    // ---------------------------------------------------------------- pintasan
+    // ------------------------------------------------------- langsung ke jalur
 
-    fun showShortcuts() {
-        val root = Environment.getExternalStorageDirectory()
-        val items = ArrayList<Pair<String, File>>()
-        items.add(activity.getString(R.string.shortcut_internal) to root)
-        prefs.homepage?.let { home ->
-            val f = File(home)
-            if (f.isDirectory) items.add(activity.getString(R.string.shortcut_home, home) to f)
+    /** Ketuk jalur di toolbar: ketik/tempel jalur lalu pindah ke sana. */
+    fun showGoTo() {
+        val input = EditText(activity).apply {
+            setText(host.activeDir().absolutePath)
+            setSingleLine(true)
+            setSelection(text.length)
         }
-        for (name in listOf("Download", "DCIM", "Documents", "Pictures", "Music", "Movies")) {
-            val f = File(root, name)
-            if (f.isDirectory) items.add(name to f)
-        }
-        for (p in prefs.bookmarks()) items.add(("★ " + p) to File(p))
-
-        val labels: List<CharSequence> = items.map { it.first }
-        AlertDialog.Builder(activity)
-            .setTitle(R.string.shortcuts_title)
-            .setItems(labels.toTypedArray()) { _, which -> host.navigate(items[which].second) }
+        val dialog = AlertDialog.Builder(activity)
+            .setTitle(R.string.goto_title)
+            .setView(padded(input))
+            .setNeutralButton(R.string.paste, null)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                val f = File(input.text.toString().trim())
+                when {
+                    f.isDirectory -> host.navigate(f)
+                    f.isFile -> host.navigate(f.parentFile ?: host.activeDir())
+                    else -> toast(R.string.path_not_found)
+                }
+            }
             .show()
+        // TEMPEL tidak menutup dialog -> pasang listener setelah show().
+        dialog.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener {
+            val cm = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = cm.primaryClip
+            val text = if (clip != null && clip.itemCount > 0) clip.getItemAt(0).coerceToText(activity).toString() else ""
+            if (text.isNotEmpty()) {
+                input.setText(text)
+                input.setSelection(text.length)
+            }
+        }
     }
 
     companion object {

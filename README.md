@@ -23,6 +23,14 @@ assets/keys/  testkey.pk8 + testkey.x509.pem (testkey AOSP, untuk fitur tanda ta
 keystore/     testkey.p12 (untuk Gradle menandatangani build debug/release)
 ```
 
+## Fitur UI (dari rekaman layar referensi)
+- ☰ = drawer: **Lokal** (Direktori Akar, Direktori Penyimpanan, Kartu SD + bar pemakaian) dan **Bookmark**.
+- Ketuk jalur di toolbar = dialog **Langsung ke jalan** (ketik / TEMPEL / OKE).
+- Ketuk file .apk = dialog **info APK** (paket, versi, ukuran, tanda tangan, SDK, waktu pasang) dengan
+  tombol FUNGSI / MELIHAT / INSTALL; ketuk baris "Tanda tangan" = **info tanda tangan**
+  (skema, algoritma, kunci publik, masa berlaku, pemilik, HASH/CRC32/MD5/SHA1/SHA256, ketuk untuk salin).
+- Tidak ada fitur terminal (sengaja dibuang).
+
 ## Tanda tangan (testkey AOSP)
 - **Build Gradle** (debug & release) ditandatangani `keystore/testkey.p12` (alias `testkey`, sandi `android`).
 - **Di dalam app**: "Buka dengan... > Tanda tangani file" pada .apk menghasilkan `<nama>_sign.apk`;

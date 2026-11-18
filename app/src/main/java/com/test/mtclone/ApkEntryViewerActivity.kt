@@ -27,7 +27,7 @@ import java.io.File
  *  - file teks lain -> bisa diedit, simpan sebagai APK baru (belum ditandatangani)
  *  - lainnya -> hex dump
  */
-class ViewerActivity : AppCompatActivity() {
+class ApkEntryViewerActivity : AppCompatActivity() {
 
     private lateinit var apk: File
     private var zipName: String = ""

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Browsing seluruh penyimpanan ala MT Manager. Perlu izin khusus "All files access"
+         di Android 11+ (diminta lewat Settings dari MainActivity), atau izin biasa di
+         versi lebih lama. -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="false"
         android:label="MT Clone"
+        android:requestLegacyExternalStorage="true"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
         <activity
@@ -17,7 +27,23 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ViewerActivity" android:exported="false" />
+        <!-- Browser isi 1 file APK (zip + dex/manifest), dibuka dari file picker ATAU
+             dari MainActivity lewat "Buka dengan... > Melihat". -->
+        <activity android:name=".ApkOpenActivity" android:exported="false" />
+        <activity android:name=".ApkEntryViewerActivity" android:exported="false" />
+
+        <!-- Viewer/editor file lepas di disk (bukan isi APK). -->
+        <activity android:name=".LocalFileViewer" android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

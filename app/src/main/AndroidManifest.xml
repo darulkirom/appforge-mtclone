@@ -16,7 +16,7 @@
         android:allowBackup="false"
         android:label="MT Clone"
         android:requestLegacyExternalStorage="true"
-        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+        android:theme="@style/Theme.MTClone">
 
         <activity
             android:name=".MainActivity"

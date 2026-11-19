@@ -13,6 +13,12 @@
     <color name="icon_folder_bg">#141414</color>
     <color name="icon_file_bg">#436072</color>
     <color name="icon_apk_bg">#6B4F3E</color>
+    <color name="icon_doc_bg">#3A4FA3</color>
+    <color name="icon_archive_bg">#7A5340</color>
+    <color name="icon_dex_bg">#2E7D74</color>
+    <color name="icon_web_bg">#2C75B6</color>
+    <color name="icon_media_bg">#8A3B4A</color>
+    <color name="row_selected">#4D3D8BF2</color>
 
     <!-- Logo launcher -->
     <color name="ic_launcher_background">#141414</color>

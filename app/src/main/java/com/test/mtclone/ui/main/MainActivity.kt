@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.Gravity
 import android.view.MenuItem
@@ -18,8 +19,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import com.test.mtclone.R
+import com.test.mtclone.core.file.FileKind
 import com.test.mtclone.core.file.FileOps
 import com.test.mtclone.core.prefs.AppPrefs
+import com.test.mtclone.ui.apk.ApkEntryViewerActivity
 import com.test.mtclone.ui.common.AppBar
 import com.test.mtclone.ui.common.color
 import com.test.mtclone.ui.common.dp
@@ -29,14 +32,15 @@ import com.test.mtclone.ui.viewer.LocalFileViewer
 import java.io.File
 
 /**
- * File manager dua jendela ala MT Manager: jendela kiri & kanan menjelajah folder
- * masing-masing (independen). Jendela yang terakhir disentuh jadi jendela aktif --
- * tombol bawah (mundur / maju / buat baru / tukar / naik) bekerja pada jendela aktif.
+ * File manager dua jendela ala MT Manager: jendela kiri & kanan menjelajah folder masing-masing
+ * (independen). Jendela yang terakhir disentuh jadi jendela aktif -- tombol bawah (mundur / maju /
+ * buat baru / tukar / naik) bekerja pada jendela aktif. Ketuk ikon = pilih, tekan lama = menu operasi.
  */
 class MainActivity : AppCompatActivity() {
 
     private val prefs by lazy { AppPrefs(this) }
     private val dialogs by lazy { MainDialogs(this, prefs, host) }
+    private val actionMenu by lazy { FileActionMenu(this, prefs, host) }
     private val drawer by lazy { StorageDrawer(this, prefs) { dir -> navigateActive(dir) } }
 
     private lateinit var bar: AppBar
@@ -44,19 +48,30 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnBack: ImageView
     private lateinit var btnForward: ImageView
     private var active = 0
+    private var lastBackPress = 0L
 
     private val paneCallbacks = object : PaneView.Callbacks {
         override fun onActivate(index: Int) = setActive(index)
 
-        override fun onOpen(index: Int, file: File) {
+        override fun onOpen(index: Int, row: Row) {
             setActive(index)
-            openEntry(file)
+            onRowClicked(row)
         }
 
         override fun onParent(index: Int) {
             setActive(index)
             panes[index].state.goUp()
             refreshAll(resetScroll = true)
+        }
+
+        override fun onLongPress(index: Int, row: Row) {
+            setActive(index)
+            onRowLongPressed(row)
+        }
+
+        override fun onToggleSelect(index: Int, row: Row) {
+            setActive(index)
+            toggleSelect(row)
         }
     }
 
@@ -70,6 +85,32 @@ class MainActivity : AppCompatActivity() {
         }
         override fun navigate(dir: File) = navigateActive(dir)
         override fun refreshAll() = this@MainActivity.refreshAll()
+
+        override fun viewApk(file: File) {
+            try {
+                panes[active].state.openApk(file)
+                refreshAll(resetScroll = true)
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.apk_open_failed, e.message ?: e.javaClass.simpleName),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+        override fun selection(): List<File> = panes[active].state.selected.toList()
+
+        override fun otherPaneDir(): File? {
+            val other = panes[1 - active].state
+            return if (other.inApk) null else other.dir
+        }
+
+        override fun clearSelection() {
+            panes.forEach { it.state.selected.clear() }
+            panes.forEach { it.redraw() }
+            updateHeader()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,25 +135,32 @@ class MainActivity : AppCompatActivity() {
         panes.forEach { prefs.setLastPath(it.index, it.state.dir.absolutePath) }
     }
 
+    /** Back: tutup drawer -> batalkan seleksi -> naik satu folder -> (di akar) tekan dua kali untuk keluar. */
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (drawer.isOpen) {
-            drawer.close()
-            return
-        }
-        val pane = panes[active]
-        val storageRoot = Environment.getExternalStorageDirectory().absolutePath
-        if (pane.state.dir.absolutePath != storageRoot && pane.state.goUp()) {
-            refreshAll(resetScroll = true)
-        } else {
-            super.onBackPressed()
+        val state = panes[active].state
+        when {
+            drawer.isOpen -> drawer.close()
+            state.selected.isNotEmpty() -> host.clearSelection()
+            state.goUp() -> refreshAll(resetScroll = true)
+            else -> {
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastBackPress < 2000) {
+                    super.onBackPressed()
+                } else {
+                    lastBackPress = now
+                    Toast.makeText(this, R.string.press_again_exit, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     // ------------------------------------------------------------ folder awal
 
     private fun startDir(index: Int): File {
-        val candidate = if (prefs.startupMode(index) == AppPrefs.STARTUP_LAST) prefs.lastPath(index) else prefs.homepage
+        val candidate =
+            if (prefs.startupMode(index) == AppPrefs.STARTUP_LAST) (prefs.lastPath(index) ?: prefs.homepage)
+            else prefs.homepage
         val f = candidate?.let { File(it) }
         return if (f != null && f.isDirectory) f else Environment.getExternalStorageDirectory()
     }
@@ -158,7 +206,24 @@ class MainActivity : AppCompatActivity() {
         refreshAll(resetScroll = true)
     }
 
-    private fun openEntry(f: File) {
+    private fun onRowClicked(row: Row) {
+        val state = panes[active].state
+        // Saat ada yang terpilih, ketuk baris = tambah/lepas pilihan (seperti MT Manager).
+        if (state.selected.isNotEmpty() && row.file != null) {
+            toggleSelect(row)
+            return
+        }
+        val node = row.node
+        if (node != null) {
+            if (node.isDir) {
+                state.apkEnter(node)
+                refreshAll(resetScroll = true)
+            } else {
+                openApkEntry(state.apk, node.name, node.zipName)
+            }
+            return
+        }
+        val f = row.file ?: return
         when {
             f.isDirectory -> navigateActive(f)
             FileOps.isApk(f) -> dialogs.showApk(f)
@@ -166,6 +231,39 @@ class MainActivity : AppCompatActivity() {
                 Intent(this, LocalFileViewer::class.java).putExtra(LocalFileViewer.EXTRA_PATH, f.absolutePath)
             )
         }
+    }
+
+    private fun openApkEntry(apk: File?, name: String, zipName: String?) {
+        if (apk == null || zipName == null) return
+        if (FileKind.isDex(name)) {
+            dialogs.showDexOpen(apk, zipName)
+        } else {
+            startActivity(
+                Intent(this, ApkEntryViewerActivity::class.java)
+                    .putExtra(ApkEntryViewerActivity.EXTRA_APK_PATH, apk.absolutePath)
+                    .putExtra(ApkEntryViewerActivity.EXTRA_ZIP_NAME, zipName)
+            )
+        }
+    }
+
+    private fun toggleSelect(row: Row) {
+        val f = row.file ?: return
+        val sel = panes[active].state.selected
+        if (!sel.add(f)) sel.remove(f)
+        panes[active].redraw()
+        updateHeader()
+    }
+
+    private fun onRowLongPressed(row: Row) {
+        val f = row.file ?: return // entry di dalam APK: belum ada operasi
+        val sel = panes[active].state.selected
+        if (!sel.contains(f)) {
+            sel.clear()
+            sel.add(f)
+        }
+        panes[active].redraw()
+        updateHeader()
+        actionMenu.show()
     }
 
     private fun swapPanes() {
@@ -186,22 +284,25 @@ class MainActivity : AppCompatActivity() {
     private fun updateHeader() {
         if (!::bar.isInitialized) return
         val pane = panes[active]
-        val dir = pane.state.dir
-        bar.title.text = dir.absolutePath
-        if (hasPermission()) {
-            val total = dir.totalSpace
-            val used = total - dir.freeSpace
-            bar.setSubtitle(
-                getString(
-                    R.string.stat_format,
-                    pane.folderCount, pane.fileCount, FileOps.formatSize(used), FileOps.formatSize(total)
+        val state = pane.state
+        bar.title.text = if (state.inApk) state.apkPath() else state.dir.absolutePath
+        when {
+            !hasPermission() -> bar.setSubtitle(getString(R.string.waiting_permission))
+            state.selected.isNotEmpty() -> bar.setSubtitle(getString(R.string.selected_count, state.selected.size))
+            state.inApk -> bar.setSubtitle(getString(R.string.stat_apk, pane.folderCount, pane.fileCount))
+            else -> {
+                val total = state.dir.totalSpace
+                val used = total - state.dir.freeSpace
+                bar.setSubtitle(
+                    getString(
+                        R.string.stat_format,
+                        pane.folderCount, pane.fileCount, FileOps.formatSize(used), FileOps.formatSize(total)
+                    )
                 )
-            )
-        } else {
-            bar.setSubtitle(getString(R.string.waiting_permission))
+            }
         }
-        btnBack.alpha = if (pane.state.canBack) 1f else 0.35f
-        btnForward.alpha = if (pane.state.canForward) 1f else 0.35f
+        btnBack.alpha = if (state.canBack) 1f else 0.35f
+        btnForward.alpha = if (state.canForward) 1f else 0.35f
     }
 
     // -------------------------------------------------------------- menu (⋮)

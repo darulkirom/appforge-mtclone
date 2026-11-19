@@ -36,7 +36,7 @@ class AppPrefs(context: Context) {
 
     // ---------------------------------------------------------- jalur startup
 
-    fun startupMode(pane: Int): Int = sp.getInt("startup_$pane", STARTUP_HOME)
+    fun startupMode(pane: Int): Int = sp.getInt("startup_$pane", STARTUP_LAST)
     fun setStartupMode(pane: Int, mode: Int) { sp.edit().putInt("startup_$pane", mode).apply() }
 
     fun lastPath(pane: Int): String? = sp.getString("last_$pane", null)

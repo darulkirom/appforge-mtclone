@@ -16,6 +16,7 @@ import com.test.mtclone.core.apk.RepackUtil
 import com.test.mtclone.core.apk.ZipTree
 import com.test.mtclone.core.axml.AxmlDecoder
 import com.test.mtclone.core.dex.DexBrowser
+import com.test.mtclone.core.dex.DexStrings
 import com.test.mtclone.core.file.FileKind
 import com.test.mtclone.core.sign.ApkSigning
 import com.test.mtclone.ui.common.AppBar
@@ -53,6 +54,7 @@ class ApkEntryViewerActivity : AppCompatActivity() {
 
     private fun render() {
         when {
+            intent.getBooleanExtra(EXTRA_STRINGS, false) -> renderStrings()
             FileKind.isDex(zipName) -> renderDex()
             FileKind.isManifest(zipName) ->
                 renderText(zipName, AxmlDecoder.decode(ZipTree.readBytes(apk, zipName)), editable = false)
@@ -65,6 +67,13 @@ class ApkEntryViewerActivity : AppCompatActivity() {
                 renderText(zipName, dump, editable = false)
             }
         }
+    }
+
+    // ------------------------------------------------------------ kolam tali
+
+    private fun renderStrings() {
+        val strings = DexStrings.read(ZipTree.readBytes(apk, zipName))
+        setContentView(buildListUi(getString(R.string.strings_title, zipName, strings.size), strings) { })
     }
 
     // -------------------------------------------------------------------- dex
@@ -190,5 +199,6 @@ class ApkEntryViewerActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_APK_PATH = "apkPath"
         const val EXTRA_ZIP_NAME = "zipName"
+        const val EXTRA_STRINGS = "strings"
     }
 }

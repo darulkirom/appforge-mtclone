@@ -134,3 +134,28 @@ fun Context.codeViewer(content: String, editable: Boolean): Pair<ScrollView, Edi
     )
     return scroll to edit
 }
+
+/** Pembungkus padding standar untuk view di dalam dialog. */
+fun Context.dialogPad(view: View): View = LinearLayout(this).apply {
+    setPadding(dp(24), dp(12), dp(24), 0)
+    addView(view, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+}
+
+/** Baris "label  nilai" untuk dialog info / properti. */
+fun Context.kvRow(label: CharSequence, value: CharSequence): LinearLayout {
+    val row = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        setPadding(0, dp(6), 0, dp(6))
+    }
+    row.addView(TextView(this).apply {
+        text = label
+        textSize = 13f
+        setTextColor(color(R.color.text_primary))
+    }, LinearLayout.LayoutParams(dp(84), ViewGroup.LayoutParams.WRAP_CONTENT))
+    row.addView(TextView(this).apply {
+        text = value
+        textSize = 12f
+        setTextColor(color(R.color.text_secondary))
+    }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+    return row
+}

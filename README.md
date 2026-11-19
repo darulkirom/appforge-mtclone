@@ -29,6 +29,15 @@ keystore/     testkey.p12 (untuk Gradle menandatangani build debug/release)
 - Ketuk file .apk = dialog **info APK** (paket, versi, ukuran, tanda tangan, SDK, waktu pasang) dengan
   tombol FUNGSI / MELIHAT / INSTALL; ketuk baris "Tanda tangan" = **info tanda tangan**
   (skema, algoritma, kunci publik, masa berlaku, pemilik, HASH/CRC32/MD5/SHA1/SHA256, ketuk untuk salin).
+- **Seleksi & operasi file**: ketuk ikon = pilih (ketuk baris lain saat ada yang terpilih = tambah/lepas),
+  tekan lama = menu: Salin →, Pindah → (ke folder jendela satunya, nama bentrok otomatis jadi "x (1)"),
+  Menghapus, Ganti nama, Peralatan (pisahkan / gabungkan berkas, ekspor daftar file), Kompres (zip),
+  Properti, Membagikan, Buka dengan…, Tambahkan bookmark.
+- **APK sebagai folder**: info APK > MELIHAT membuka isi APK langsung di jendela (".." / ↑ / Back untuk keluar).
+  Ketuk classes*.dex > Dekompilasi (class -> smali) atau Kolam tali (daftar string dex).
+- Back: tutup drawer > batalkan seleksi > naik folder > di akar "Tekan lagi untuk keluar".
+  Saat dibuka lagi, kedua jendela kembali ke folder terakhir.
+- Ikon file per jenis (kode/teks biru, arsip cokelat, dex hijau-teal, APK memakai ikon asli aplikasinya).
 - Tidak ada fitur terminal (sengaja dibuang).
 
 ## Tanda tangan (testkey AOSP)

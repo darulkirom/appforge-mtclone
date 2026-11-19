@@ -12,7 +12,7 @@ import com.test.mtclone.core.prefs.AppPrefs
 import com.test.mtclone.ui.common.color
 import java.io.File
 
-/** Satu jendela file manager (kiri/kanan). Tiap jendela punya folder & riwayat sendiri. */
+/** Satu jendela file manager (kiri/kanan). Tiap jendela punya folder, riwayat, dan seleksi sendiri. */
 class PaneView(
     context: Context,
     val index: Int,
@@ -23,8 +23,10 @@ class PaneView(
 
     interface Callbacks {
         fun onActivate(index: Int)
-        fun onOpen(index: Int, file: File)
+        fun onOpen(index: Int, row: Row)
         fun onParent(index: Int)
+        fun onLongPress(index: Int, row: Row)
+        fun onToggleSelect(index: Int, row: Row)
     }
 
     var state = PaneState(startDir)
@@ -34,10 +36,22 @@ class PaneView(
     var fileCount: Int = 0
         private set
 
-    private val rowAdapter = FileRowAdapter(context, prefs) { row ->
-        callbacks.onActivate(index)
-        if (row.isParent) callbacks.onParent(index) else callbacks.onOpen(index, row.file)
-    }
+    private val rowAdapter = FileRowAdapter(
+        context, prefs,
+        isSelected = { r -> val f = r.file; f != null && state.selected.contains(f) },
+        onClick = { r ->
+            callbacks.onActivate(index)
+            if (r.isParent) callbacks.onParent(index) else callbacks.onOpen(index, r)
+        },
+        onLongClick = { r ->
+            callbacks.onActivate(index)
+            callbacks.onLongPress(index, r)
+        },
+        onIconClick = { r ->
+            callbacks.onActivate(index)
+            callbacks.onToggleSelect(index, r)
+        }
+    )
 
     private val list = RecyclerView(context).apply {
         layoutManager = LinearLayoutManager(context)
@@ -62,7 +76,9 @@ class PaneView(
         setBackgroundColor(context.color(if (active) R.color.pane_active else R.color.pane_inactive))
     }
 
-    /** Muat ulang isi folder. [allowed] = false kalau izin akses file belum diberikan. */
+    fun redraw() = rowAdapter.redraw()
+
+    /** Muat ulang isi jendela. [allowed] = false kalau izin akses file belum diberikan. */
     fun refresh(allowed: Boolean, resetScroll: Boolean = false) {
         if (!allowed) {
             folderCount = 0
@@ -70,16 +86,29 @@ class PaneView(
             rowAdapter.submit(emptyList())
             return
         }
-        val dir = state.dir
-        val spec = prefs.getSort(index, dir.absolutePath)
-        val listing = FileOps.listDir(dir, spec, prefs.showHidden, state.filter)
-        folderCount = listing.folders.size
-        fileCount = listing.files.size
-
-        val rows = ArrayList<Row>(listing.folders.size + listing.files.size + 1)
-        if (dir.parentFile != null) rows.add(Row(dir, true))
-        listing.folders.forEach { rows.add(Row(it, false)) }
-        listing.files.forEach { rows.add(Row(it, false)) }
+        val rows = ArrayList<Row>()
+        val apkNode = state.apkNode()
+        if (state.inApk && apkNode != null) {
+            // Isi APK sebagai folder
+            val kids = apkNode.children.values.toList()
+            val folders = kids.filter { it.isDir }
+            val files = kids.filter { !it.isDir }
+            folderCount = folders.size
+            fileCount = files.size
+            rows.add(Row(null, null, true))
+            folders.forEach { rows.add(Row(null, it, false)) }
+            files.forEach { rows.add(Row(null, it, false)) }
+        } else {
+            val dir = state.dir
+            val spec = prefs.getSort(index, dir.absolutePath)
+            val listing = FileOps.listDir(dir, spec, prefs.showHidden, state.filter)
+            state.selected.retainAll { it.exists() }
+            folderCount = listing.folders.size
+            fileCount = listing.files.size
+            if (dir.parentFile != null) rows.add(Row(dir, null, true))
+            listing.folders.forEach { rows.add(Row(it, null, false)) }
+            listing.files.forEach { rows.add(Row(it, null, false)) }
+        }
         rowAdapter.submit(rows)
         if (resetScroll) list.scrollToPosition(0)
     }

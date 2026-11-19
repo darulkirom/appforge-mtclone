@@ -23,7 +23,7 @@ import com.test.mtclone.core.file.SortSpec
 import com.test.mtclone.core.prefs.AppPrefs
 import com.test.mtclone.core.sign.ApkSigning
 import com.test.mtclone.ui.apk.ApkInfoDialogs
-import com.test.mtclone.ui.apk.ApkOpenActivity
+import com.test.mtclone.ui.apk.ApkEntryViewerActivity
 import com.test.mtclone.ui.common.color
 import com.test.mtclone.ui.common.dp
 import java.io.File
@@ -43,6 +43,13 @@ class MainDialogs(
         fun setActiveFilter(filter: String)
         fun navigate(dir: File)
         fun refreshAll()
+        /** Buka isi APK langsung di jendela aktif. */
+        fun viewApk(file: File)
+        /** File terpilih di jendela aktif (hasil seleksi / tekan lama). */
+        fun selection(): List<File>
+        /** Folder jendela satunya (tujuan salin/pindah); null kalau jendela itu sedang membuka APK. */
+        fun otherPaneDir(): File?
+        fun clearSelection()
     }
 
     private fun toast(res: Int) = Toast.makeText(activity, res, Toast.LENGTH_SHORT).show()
@@ -83,10 +90,25 @@ class MainDialogs(
         }.start()
     }
 
-    private fun viewApk(f: File) {
-        activity.startActivity(
-            Intent(activity, ApkOpenActivity::class.java).putExtra(ApkOpenActivity.EXTRA_APK_PATH, f.absolutePath)
+    private fun viewApk(f: File) = host.viewApk(f)
+
+    /** Ketuk classes*.dex di dalam APK: Dekompilasi (daftar class -> smali) atau Kolam tali (string pool). */
+    fun showDexOpen(apk: File, zipName: String) {
+        val labels: List<CharSequence> = listOf(
+            activity.getString(R.string.dex_decompile),
+            activity.getString(R.string.dex_strings)
         )
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.open_with_title)
+            .setItems(labels.toTypedArray()) { _, which ->
+                activity.startActivity(
+                    Intent(activity, ApkEntryViewerActivity::class.java)
+                        .putExtra(ApkEntryViewerActivity.EXTRA_APK_PATH, apk.absolutePath)
+                        .putExtra(ApkEntryViewerActivity.EXTRA_ZIP_NAME, zipName)
+                        .putExtra(ApkEntryViewerActivity.EXTRA_STRINGS, which == 1)
+                )
+            }
+            .show()
     }
 
     private enum class OpenAction { INSTALL, VIEW, SIGN, CONVERT }

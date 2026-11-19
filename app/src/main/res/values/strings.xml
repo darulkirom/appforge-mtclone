@@ -27,7 +27,7 @@
     <string name="waiting_permission">Menunggu izin akses file…</string>
     <string name="permission_hint">Izinkan \"Akses semua file\" lalu kembali ke app.</string>
     <string name="bookmark_added">Bookmark ditambahkan.</string>
-    <string name="homepage_set">Homepage diset ke folder ini.</string>
+    <string name="homepage_set">Tetapkan sebagai beranda berhasil</string>
 
     <!-- Menu ⋮ -->
     <string name="menu_refresh">Menyegarkan</string>
@@ -92,6 +92,80 @@
     <string name="sig_copied">Disalin.</string>
     <string name="sig_no_cert">Tidak ada sertifikat penanda tangan di APK ini.</string>
 
+    <!-- Seleksi, keluar -->
+    <string name="selected_count">Dipilih: %1$d</string>
+    <string name="press_again_exit">Tekan lagi untuk keluar</string>
+
+    <!-- Menu tekan lama -->
+    <string name="op_copy">Salin →</string>
+    <string name="op_move">Pindah →</string>
+    <string name="op_delete">Menghapus</string>
+    <string name="op_rename">Ganti nama</string>
+    <string name="op_tools">Peralatan</string>
+    <string name="op_compress">Kompres</string>
+    <string name="op_properties">Properti</string>
+    <string name="op_share">Membagikan</string>
+    <string name="op_open_with">Buka dengan…</string>
+    <string name="op_bookmark">Tambahkan bookmark</string>
+
+    <string name="confirm_copy">Salin %1$d item ke:\n%2$s</string>
+    <string name="confirm_move">Pindahkan %1$d item ke:\n%2$s</string>
+    <string name="confirm_delete">Hapus %1$d item?\nTindakan ini tidak bisa dibatalkan.</string>
+    <string name="working_copy">Menyalin…</string>
+    <string name="working_move">Memindahkan…</string>
+    <string name="working_delete">Menghapus…</string>
+    <string name="working_compress">Mengompres…</string>
+    <string name="working_tool">Memproses…</string>
+    <string name="op_done">Selesai.</string>
+    <string name="op_failed">Gagal: %1$s</string>
+    <string name="op_failed_n">%1$d item gagal diproses.</string>
+    <string name="no_other_pane">Jendela satunya sedang membuka APK, pilih folder dulu.</string>
+    <string name="into_self">Folder tidak bisa disalin atau dipindah ke dalam dirinya sendiri.</string>
+    <string name="need_single">Pilih satu item saja.</string>
+    <string name="need_file">Hanya untuk satu file (bukan folder).</string>
+    <string name="rename_failed">Gagal mengganti nama (nama sudah dipakai?).</string>
+    <string name="compress_title">Kompres</string>
+    <string name="compress_hint">Nama file zip</string>
+
+    <!-- Peralatan -->
+    <string name="tools_title">Peralatan</string>
+    <string name="tool_split">Pisahkan berkas</string>
+    <string name="tool_merge">Gabungkan berkas</string>
+    <string name="tool_export">Ekspor daftar file</string>
+    <string name="split_hint">Ukuran tiap bagian (MB)</string>
+    <string name="merge_need">Pilih bagian pertama (berakhiran .001).</string>
+
+    <!-- Properti -->
+    <string name="props_title">Properti</string>
+    <string name="calculating">Menghitung…</string>
+    <string name="props_path">Jalur</string>
+    <string name="props_type">Jenis</string>
+    <string name="props_size">Ukuran</string>
+    <string name="props_contents">Isi</string>
+    <string name="props_modified">Diubah</string>
+    <string name="props_perm">Izin</string>
+    <string name="type_folder">Folder</string>
+    <string name="type_file">File</string>
+    <string name="type_multi">%1$d item</string>
+    <string name="size_full">%1$s (%2$d byte)</string>
+    <string name="contents_fmt">%1$d folder, %2$d file</string>
+    <string name="perm_fmt">baca %1$s, tulis %2$s, eksekusi %3$s</string>
+    <string name="yes">ya</string>
+    <string name="no">tidak</string>
+
+    <!-- Bagikan / buka dengan aplikasi lain -->
+    <string name="share_dirs">Folder tidak bisa dibagikan.</string>
+    <string name="share_title">Bagikan lewat</string>
+    <string name="open_title">Buka dengan</string>
+    <string name="open_none">Tidak ada aplikasi untuk membuka file ini.</string>
+
+    <!-- APK di dalam jendela -->
+    <string name="stat_apk">Folder: %1$d File: %2$d</string>
+    <string name="apk_open_failed">Gagal membuka APK: %1$s</string>
+    <string name="dex_decompile">Dekompilasi</string>
+    <string name="dex_strings">Kolam tali</string>
+    <string name="strings_title">%1$s (%2$d string)</string>
+
     <!-- Buat baru -->
     <string name="create_title">Membuat</string>
     <string name="create_hint">Nama</string>
@@ -132,9 +206,6 @@
     <string name="sign_apks_unsupported">Format .apks (split) belum didukung. Ekstrak dulu lalu tanda tangani tiap .apk.</string>
 
     <!-- Penjelajah APK -->
-    <string name="apk_open_button">Buka APK</string>
-    <string name="apk_empty">Belum ada APK dibuka.\nKetuk \"Buka APK\" di pojok kanan atas.</string>
-    <string name="apk_path_root">/%1$s</string>
     <string name="apk_n_items">%1$d item</string>
     <string name="dex_title">%1$s (%2$d class)</string>
     <string name="smali_failed">// gagal membongkar %1$s menjadi smali</string>

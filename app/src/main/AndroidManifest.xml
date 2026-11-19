@@ -33,7 +33,6 @@
 
         <!-- Browser isi 1 file APK (zip + dex/manifest), dibuka dari file picker ATAU
              dari MainActivity lewat "Buka dengan... > Melihat". -->
-        <activity android:name=".ui.apk.ApkOpenActivity" android:exported="false" />
         <activity android:name=".ui.apk.ApkEntryViewerActivity" android:exported="false" />
 
         <!-- Viewer/editor file lepas di disk (bukan isi APK). -->

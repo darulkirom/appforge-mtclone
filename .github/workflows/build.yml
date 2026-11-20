@@ -4,6 +4,15 @@ on:
   push:
   workflow_dispatch:
 
+# Perlu untuk membuat/menimpa release "latest".
+permissions:
+  contents: write
+
+# Push beruntun: batalkan build lama, hanya build terbaru yang dipublikasikan.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +31,16 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MTClone-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+      # APK diunggah sebagai file .apk langsung (bukan zip) ke release "latest" yang selalu diganti.
+      # Link tetap: https://github.com/${{ github.repository }}/releases/download/latest/MTClone-debug.apk
+      - name: Publish APK ke release "latest"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk MTClone-debug.apk
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest MTClone-debug.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "MT Clone - build terbaru" \
+            --notes "Build otomatis dari commit ${GITHUB_SHA::7}. Ditandatangani testkey AOSP (publik, untuk uji/mod pribadi)."

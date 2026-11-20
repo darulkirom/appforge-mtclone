@@ -84,6 +84,9 @@ class FileRowAdapter(
         val row = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
+            // Wajib: tanpa ini RecyclerView memberi lebar WRAP_CONTENT -> area sentuh hanya selebar teks.
+            layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            minimumHeight = ctx.dp(44)
         }
         val badge = ctx.newIconBadge(badgeDp)
         val column = LinearLayout(ctx).apply { orientation = LinearLayout.VERTICAL }

@@ -163,6 +163,7 @@ class ApkEntryViewerActivity : AppCompatActivity() {
                     setTextColor(color(R.color.text_primary))
                     setPadding(dp(16), dp(10), dp(16), dp(10))
                     background = rippleDrawable()
+                    layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 }
                 return object : RecyclerView.ViewHolder(tv) {}
             }
